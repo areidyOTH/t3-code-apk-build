@@ -1,0 +1,14 @@
+name: Policy checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s tests -v
+      - run: python3 scripts/policy.py --check

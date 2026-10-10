@@ -1,0 +1,9 @@
+// Generated Expo release builds otherwise use the generated debug signing key.
+// This trusted init script creates the unsigned boundary for the signing job.
+gradle.beforeProject { p ->
+    p.pluginManager.withPlugin('com.android.application') {
+        p.extensions.getByName('androidComponents').finalizeDsl { extension ->
+            extension.buildTypes.getByName('release').signingConfig = null
+        }
+    }
+}

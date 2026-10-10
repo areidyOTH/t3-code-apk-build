@@ -1,0 +1,8 @@
+{
+  "APP_VARIANT": "production",
+  "EXPO_NO_DOTENV": "1",
+  "EXPO_NO_GIT_STATUS": "1",
+  "CI": "1",
+  "NODE_OPTIONS": "--max-old-space-size=4096",
+  "T3CODE_MOBILE_UPDATES_ENABLED": "0"
+}

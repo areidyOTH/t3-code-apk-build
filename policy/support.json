@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "timezone": "Australia/Melbourne",
+  "starts_at": "2026-10-10T00:00:00+11:00",
+  "expires_at": "2026-11-10T00:00:00+11:00",
+  "upstream_repository": "pingdotgg/t3code",
+  "quota_environment": "t3-apk-build-quota-v1",
+  "quota_task": "t3-apk:claim-v1"
+}

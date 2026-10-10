@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "enabled": true,
+  "upstream_repository": "pingdotgg/t3code",
+  "source_sha": "b38aa18365fe314e079d99670932bedfc7407e5a",
+  "version_name": "2.0.0",
+  "version_code": 82,
+  "android_package": "io.github.areidyoth.t3code",
+  "play_beta": {
+    "channel": "public-google-play-beta",
+    "observed_version_code": 82,
+    "evidence": "User firsthand observation: enrolled in the public Google Play beta and installed version code82 from Google Play; corroborated by local package metadata. This does not assert latest version or worldwide distribution.",
+    "observed_at": "2026-10-10T08:09:00Z"
+  },
+  "source_mapping": {
+    "workflow_run_url": "https://github.com/pingdotgg/t3code/actions/runs/37502942759",
+    "eas_build_id": "3e6ed32c-a91c-4734-8e3e-41f3a9c1f9f2",
+    "source_sha": "b38aa18365fe314e079d99670932bedfc7407e5a",
+    "version_code": 82,
+    "evidence": "Official workflow logs show git log -1 exact source SHA and EAS Android build ID, appVersion2.0.0 and appBuildVersion82. Public Play eligibility is separately established by user observation, not the internal submission track."
+  },
+  "review": {
+    "reviewed_by": "maintainer-directed source/evidence review",
+    "reviewed_at": "2026-10-10T08:40:57.048674+00:00",
+    "notes": "Seed release source mapping verified from official build logs; user observation establishes public beta availability. Later internal builds are not eligible. Source rebuild omits private EAS configuration, uses its own package, and disables OTA."
+  },
+  "build": {
+    "recipe": "expo-prebuild-gradle-release-v1",
+    "public_environment_sha256": "3128cc38947d85ed6117a39b9eb9082027b2f117a82f21c185d10cb7607f9d1d",
+    "signer_certificate_sha256": "1343d6833fa4c08c4bc6deb67180be48c7cee46a5e67f838390847854052d11c"
+  }
+}

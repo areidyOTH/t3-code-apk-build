@@ -1,0 +1,111 @@
+name: Reviewed Play beta APK
+on:
+  schedule:
+    - cron: '15 14 * * *' # Daily eligibility check, not a guaranteed daily build.
+  workflow_dispatch:
+
+permissions: {}
+concurrency:
+  group: t3-apk-build-quota-v1 # Fixed across every ref/event; this is the ledger lock.
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    if: github.event.repository.private == false && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # GitHub requires push access to enumerate draft releases.
+      actions: read
+      deployments: write
+    outputs:
+      allowed: ${{ steps.quota.outputs.allowed }}
+      claim_id: ${{ steps.quota.outputs.claim_id }}
+      tag: ${{ steps.quota.outputs.tag }}
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+      - name: Policy regression checks
+        run: python3 -m unittest discover -s tests -v
+      - name: Reserve allowance before actual build
+        id: quota
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: python3 scripts/gate.py
+
+  build:
+    needs: gate
+    # Job-only reruns can reuse gate outputs: independently deny them here AND in build.py.
+    if: needs.gate.outputs.allowed == 'true' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    permissions:
+      contents: read
+      deployments: read
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+      - name: Isolated unsigned source build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          QUOTA_CLAIM_ID: ${{ needs.gate.outputs.claim_id }}
+        run: python3 scripts/build.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        id: upload
+        with:
+          name: unsigned-build
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  sign-publish:
+    needs: [gate, build]
+    if: needs.gate.outputs.allowed == 'true' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: apk-signing
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ needs.build.outputs.artifact_id }}
+          path: dist/
+          merge-multiple: true
+      - name: Sign and inspect final APK with trusted tools
+        env:
+          APK_KEYSTORE_B64: ${{ secrets.APK_KEYSTORE_B64 }}
+          APK_STORE_PASSWORD: ${{ secrets.APK_STORE_PASSWORD }}
+          APK_KEY_PASSWORD: ${{ secrets.APK_KEY_PASSWORD }}
+          APK_KEY_ALIAS: ${{ secrets.APK_KEY_ALIAS }}
+          QUOTA_CLAIM_ID: ${{ needs.gate.outputs.claim_id }}
+        run: python3 scripts/sign.py
+      - name: Attest final APK and every verification file
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
+        id: provenance
+        with:
+          subject-path: dist/*
+      - name: Retain provenance bundle
+        env:
+          BUNDLE_PATH: ${{ steps.provenance.outputs.bundle-path }}
+        run: cp -- "$BUNDLE_PATH" dist/provenance.json
+      - name: Check support interval again and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/publish.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: signed-release
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
