@@ -6,7 +6,7 @@ The initial release candidate is the observed Play beta build 82. This is the fi
 
 ## Current status
 
-Local preparation is in progress for the approved public repository [areidyOTH/t3-code-apk-build](https://github.com/areidyOTH/t3-code-apk-build). **No APK has been built, hosted CI has not been activated, and end-to-end CI, signing, attestation, and installation have not been verified.** The project must fail closed while its release mapping or required build inputs are incomplete.
+The public repository [areidyOTH/t3-code-apk-build](https://github.com/areidyOTH/t3-code-apk-build) is active. Its initial hosted policy checks passed, including all 26 regression tests. Local Docker toolchain provisioning and a configuration-only Android SDK check passed as the non-root build user. **The first APK build is pending; end-to-end building, signing, attestation, and installation have not been verified.** The project must fail closed while its release mapping or required build inputs are incomplete.
 
 The public repository has immutable releases enabled. Publication uploads and verifies a draft before making it public; once published, the release's assets and tag are protected from replacement.
 
@@ -24,7 +24,7 @@ The rebuilt package is `io.github.areidyoth.t3code`, displayed as **T3 Code Unof
 1343d6833fa4c08c4bc6deb67180be48c7cee46a5e67f838390847854052d11c
 ```
 
-Build 82's production configuration enables Expo OTA updates. This rebuild disables OTA so a downloaded JavaScript update cannot silently replace the bundle tied to the attested source. That adaptation means the rebuild represents the pinned source's embedded bundle, not any subsequently downloaded official OTA bundle. Public configuration comes from the reviewed source or release APK evidence; upstream private EAS environment variables must not be fetched. The reviewed default environment omits external Clerk, managed T3 Connect, and push-service configuration. Those services and direct pairing have not been tested in the rebuild.
+Build 82's production configuration enables Expo OTA updates. This rebuild disables OTA so a downloaded JavaScript update cannot silently replace the bundle tied to the attested source. That adaptation means the rebuild represents the pinned source's embedded bundle, not any subsequently downloaded official OTA bundle. Public configuration comes from the reviewed source or release APK evidence; upstream private EAS environment variables must not be fetched. The reviewed default environment omits external Clerk, managed T3 Connect, and push-service configuration. Static source review found the direct-pairing configuration flow intact. Those services and direct pairing have not been tested in the rebuild.
 
 ## Release and build rules
 
