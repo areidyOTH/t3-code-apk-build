@@ -6,7 +6,7 @@ The [published Play beta 82 rebuild](https://github.com/areidyOTH/t3-code-apk-bu
 
 For each accepted release, retain the signed APK, its SHA-256 digest, signing-certificate SHA-256 fingerprint, the unsigned APK digest, the source/build manifest, the permitted adaptation diff, and provenance attestation bundles. The manifest must distinguish the builder repository/commit from the external upstream repository/commit and bind the public Play release evidence to that upstream commit.
 
-The manifest must also record the version code and name, official and rebuilt package identities, pinned tool and dependency information, build workflow/run/attempt, ledger claim, support cutoff, and the explicit OTA-disabling adaptation. Missing evidence blocks publication.
+The manifest and linked release evidence must also record the version code and name, official and rebuilt package identities, pinned tool and dependency information, build workflow/run/attempt, ledger claim, support cutoff, and the explicit OTA-disabling adaptation. Missing evidence blocks publication.
 
 ## Reviewer checks
 
