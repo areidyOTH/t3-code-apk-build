@@ -16,7 +16,7 @@ The manifest must also record the version code and name, official and rebuilt pa
 4. Verify the source/build manifest and adaptation diff attestations too. Check that the APK digest, source commit, configuration, and signer fingerprint agree across all evidence. The normal builder attestation does not by itself identify an external upstream checkout.
 5. Inspect the APK's package, version code/name, and signing-certificate fingerprint. The independently managed fingerprint must match the documented rebuild signer; it is not the Google Play fingerprint.
 6. Check the adaptation disables Expo OTA and that the built bundle derives from the pinned source. This does not reproduce any downloaded official OTA update.
-7. Inspect the persistent claim and prior workflow/job history. Confirm all reserved failures/cancellations count, no rerun performs a build, the 24-hour cooldown and Melbourne day check both pass, and execution precedes the exclusive cutoff.
+7. Inspect the persistent claims and full workflow/job/step history. Determine whether successful building, signing, attestation, and complete publication have occurred. A subsequent artifact-upload or housekeeping failure does not undo that milestone. Before it, completed failed/cancelled bootstrap claims remain audit history without imposing the daily limit or cooldown. After it, all reserved attempts, including failures/cancellations, count toward the 24-hour cooldown and Melbourne day limit. Confirm no rerun performs a build, incomplete or missing history blocks a claim, and execution precedes the exclusive cutoff.
 
 ## Verify downloaded files
 
