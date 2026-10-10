@@ -1,6 +1,6 @@
 # Verify a rebuild
 
-The hosted bootstrap retry produced an unsigned APK, and local diagnostic signing verified the pinned certificate and APK metadata. The hosted signing step failed on a certificate-output parsing mismatch; no attested APK or public release has been produced. The instructions here define the required release checks; they are not a report of successful end-to-end verification.
+The [published Play beta 82 rebuild](https://github.com/areidyOTH/t3-code-apk-build/releases/tag/play-beta-82-b38aa18365fe) passed downloaded-file verification: all 13 checksums and 15 remote asset digests, expected GitHub repository/workflow provenance, pinned APK signing certificate, and APK/manifest bindings. The exact released bytes also passed basic installation and launch checks on an Android 16 x86_64 emulator. These results do not establish actual pairing, production-service behavior, physical-device compatibility, or byte-for-byte reproducibility.
 
 ## Evidence to retain
 
@@ -27,7 +27,7 @@ gh release download play-beta-82-b38aa18365fe \
   --repo areidyOTH/t3-code-apk-build --dir download
 ```
 
-This command will fail until a successful build has published that release. Expected assets are `t3-code.apk`, `SHA256SUMS`, `build-manifest.json`, `source-diff.patch`, `public-environment.json`, `apk-signature.txt`, `android-badging.txt`, `android-manifest.txt`, `dependency-inventory.json`, `toolchain.json`, `image-id.txt`, `unsigned.gradle`, `container-build-recipe.py`, `builder.Dockerfile`, and `provenance.json`.
+Expected assets are `t3-code.apk`, `SHA256SUMS`, `build-manifest.json`, `source-diff.patch`, `public-environment.json`, `apk-signature.txt`, `android-badging.txt`, `android-manifest.txt`, `dependency-inventory.json`, `toolchain.json`, `image-id.txt`, `unsigned.gradle`, `container-build-recipe.py`, `builder.Dockerfile`, and `provenance.json`.
 
 The initial rebuild certificate SHA-256 is pinned below. Confirm it against the independently reviewed repository policy or another trusted maintainer channel. Do not learn the expected signing identity only from the download being checked:
 
@@ -41,10 +41,14 @@ The expected attestation signer workflow is `areidyOTH/t3-code-apk-build/.github
 
 The script authenticates the checksum file before comparing all required file hashes, separately verifies APK and build-manifest provenance, verifies the APK signature against the pinned certificate, and checks manifest bindings for the APK, adaptation diff, and public environment. It rejects missing required files and missing or duplicate checksum entries. Human review must still assess the attested builder code, source mapping, dependency/tool records, and configuration differences.
 
-Successful operation on an actual published release, including authentication of its metadata, remains pending.
+The verifier passed on the release from [workflow run 38050314520](https://github.com/areidyOTH/t3-code-apk-build/actions/runs/38050314520). The signed APK SHA-256 is `caef567fa2d8b9ac530d69db2e0c5ca24df43473bcfcfe81f5eeb4fa61c0914b`. Independent APK inspection confirmed package `io.github.areidyoth.t3code`, version code `82`, version name `2.0.0`, minimum SDK `24`, target SDK `36`, disabled native Expo OTA flag, and 16 KB ZIP alignment. The reviewed recipe/environment files matched their published attested copies. The adaptation diff's workflow attestation was also verified directly.
+
+The real Deployments and Actions history recognized the first successful publication. A read-only probe confirmed that the exact source skips as already published, a hypothetical different candidate on the claimed Melbourne day is denied, and a next-midnight attempt is denied by the 24-hour cooldown. Every POST was prohibited during that probe; no extra build was dispatched.
+
+The exact signed APK bytes were installed and cold-launched on Pixel_9_API_36 (Android 16, x86_64 emulator). Threads, manual Host/Pairing Code fields, and Local Settings rendered and responded. No app fatal, React Native, or native-library loading error was captured. No credentials were entered or actual pairing performed.
 
 ## Meaning and limits
 
 Checksums detect differing bytes when compared with a trusted value. APK signatures establish the rebuild key's identity. Provenance attestations bind artifact bytes to the stated builder execution; consumers must verify the expected repository/workflow and inspect its behavior.
 
-These checks do not certify upstream security, absence of malware, equivalence to Google's signing key, equality to a Play-generated split APK, or byte-for-byte reproducibility. Independent reproducibility, the completed signed-release pipeline, signing-key continuity, and installation/launch behavior have not yet been tested.
+These checks do not certify upstream security, absence of malware, equivalence to Google's signing key, equality to a Play-generated split APK, or byte-for-byte reproducibility. The two hosted unsigned builds differed in APK bytes, with `assets/app.manifest` the sole differing uncompressed ZIP entry; its JSON differed only in `id` and `commitTime`. Signing-key continuity across future releases, actual pairing, production services, ARM64 runtime behavior, and physical-device compatibility remain untested.
