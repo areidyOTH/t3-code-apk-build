@@ -1,6 +1,6 @@
 # Verify a rebuild
 
-No APK has been produced. Hosted policy checks passed, but the first admitted build failed during Gradle dependency resolution before artifact upload, signing, or publication. The instructions here define the required checks; they are not a report of successful end-to-end verification.
+The hosted bootstrap retry produced an unsigned APK, and local diagnostic signing verified the pinned certificate and APK metadata. The hosted signing step failed on a certificate-output parsing mismatch; no attested APK or public release has been produced. The instructions here define the required release checks; they are not a report of successful end-to-end verification.
 
 ## Evidence to retain
 

@@ -57,14 +57,22 @@ class VerifierTests(unittest.TestCase):
             raise subprocess.CalledProcessError(1, args)
         return subprocess.CompletedProcess(args, 0)
 
-    def invoke(self, crypto=None):
+    def invoke(self, crypto=None, signature=None):
         args = ["verify.py", str(self.root), "--repo", REPO, "--signer-sha256", PIN]
-        with patch.object(sys, "argv", args), patch("subprocess.run", side_effect=crypto or self.gh), patch("subprocess.check_output", return_value="Signer #1 certificate SHA-256 digest: " + PIN + "\n"):
+        with patch.object(sys, "argv", args), patch("subprocess.run", side_effect=crypto or self.gh), patch("subprocess.check_output", return_value=signature or "Signer #1 certificate SHA-256 digest: " + PIN + "\n"):
             runpy.run_path(str(ROOT / "scripts/verify.py"), run_name="__main__")
 
     def test_authenticates_sums_manifest_and_apk(self):
         self.invoke()
         self.assertEqual([Path(call[3]).name for call in self.calls], ["SHA256SUMS", "t3-code.apk", "build-manifest.json"])
+
+    def test_build_tools37_scheme_signer_accepted_but_second_signer_denied(self):
+        signature = "Number of signers: 1\nV3.0 Signer: certificate SHA-256 digest: " + PIN + "\n"
+        self.invoke(signature=signature)
+        for altered in (signature + "V3.0 Signer #2: certificate SHA-256 digest: " + "b" * 64 + "\n",
+                        "Number of signers: 1\nV3.0 Signer: certificate SHA-256 digest: " + "b" * 64 + "\n"):
+            with self.subTest(altered=altered), self.assertRaises(SystemExit):
+                self.invoke(signature=altered)
 
     def test_tampered_manifest_and_recomputed_sums_fail_attestation(self):
         (self.root / "build-manifest.json").write_text('{"source_sha":"forged"}')

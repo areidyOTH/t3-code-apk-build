@@ -18,7 +18,27 @@ def run(*args, **kwargs):
 
 
 def signer_fingerprints(text):
-    return re.findall(r"^Signer #\d+ certificate SHA-256 digest: ([0-9a-f]{64})$", text, re.M)
+    # Build Tools37 prefixes certificates with their verified signature scheme;
+    # older apksigner versions use numbered signers without a scheme prefix.
+    pattern = r"(?:Signer #[1-9]\d*|(?:V1|V2|V3\.0|V3\.1) Signer(?: #[1-9]\d*)?:) certificate SHA-256 digest: ([0-9a-f]{64})"
+    fingerprints = []
+    counts = []
+    scheme_label = False
+    for line in text.splitlines():
+        if line.startswith("Number of signers:"):
+            match = re.fullmatch(r"Number of signers: ([1-9]\d*)", line)
+            if not match:
+                return []
+            counts.append(int(match[1]))
+        if "certificate SHA-256 digest:" in line:
+            match = re.fullmatch(pattern, line)
+            if not match:
+                return []  # Never ignore an unrecognized or malformed certificate.
+            fingerprints.append(match[1])
+            scheme_label = scheme_label or line.startswith("V")
+    if (counts and counts != [1]) or (scheme_label and counts != [1]):
+        return []
+    return fingerprints
 
 
 def ota_disabled(text):

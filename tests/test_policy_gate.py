@@ -394,6 +394,26 @@ class BoundariesTests(unittest.TestCase):
         self.assertEqual(signer_fingerprints("Signer #1 certificate SHA-256 digest: " + "a" * 64 + "\n"), ["a" * 64])
         self.assertEqual(signer_fingerprints("Signer #1 certificate SHA-256 digest: " + "a" * 64 + "junk\n"), [])
 
+    def test_build_tools37_scheme_signer_matches_actual_public_output(self):
+        pin = "1343d6833fa4c08c4bc6deb67180be48c7cee46a5e67f838390847854052d11c"
+        output = (Path(__file__).parent / "fixtures/apksigner37.txt").read_text()
+        self.assertEqual(signer_fingerprints(output), [pin])
+        for scheme in ("V1", "V2", "V3.0", "V3.1"):
+            with self.subTest(scheme=scheme):
+                self.assertEqual(signer_fingerprints(f"Number of signers: 1\n{scheme} Signer: certificate SHA-256 digest: {pin}\n"), [pin])
+
+    def test_unknown_malformed_and_additional_signers_never_hide(self):
+        valid = "Number of signers: 1\nV3.0 Signer: certificate SHA-256 digest: " + "a" * 64 + "\n"
+        for altered in ("V9 Signer: certificate SHA-256 digest: " + "b" * 64,
+                        "V3.0 Signer: certificate SHA-256 digest: " + "b" * 64 + "junk",
+                        "Signer #2 certificate SHA-256 digest: " + "B" * 64):
+            with self.subTest(altered=altered):
+                self.assertEqual(signer_fingerprints(valid + altered + "\n"), [])
+        self.assertEqual(signer_fingerprints(valid + "V3.0 Signer #2: certificate SHA-256 digest: " + "b" * 64), ["a" * 64, "b" * 64])
+        for altered in (valid.replace("Number of signers: 1", "Number of signers: 2"),
+                        valid.replace("Number of signers: 1\n", ""), valid + "Number of signers: 1\n"):
+            self.assertEqual(signer_fingerprints(altered), [])
+
     def test_source_adaptation_fails_if_source_shape_changes(self):
         with self.assertRaises(ValueError):
             adapted("new source format", 82, "io.github.areidyoth.t3code")
