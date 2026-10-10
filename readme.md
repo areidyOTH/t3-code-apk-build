@@ -6,7 +6,9 @@ The initial release candidate is the observed Play beta build 82. This is the fi
 
 ## Current status
 
-The public repository [areidyOTH/t3-code-apk-build](https://github.com/areidyOTH/t3-code-apk-build) is active. Its initial hosted policy checks passed, including all 26 regression tests. Local Docker toolchain provisioning and a configuration-only Android SDK check passed as the non-root build user. **The first APK build is pending; end-to-end building, signing, attestation, and installation have not been verified.** The project must fail closed while its release mapping or required build inputs are incomplete.
+The public repository [areidyOTH/t3-code-apk-build](https://github.com/areidyOTH/t3-code-apk-build) is active. Hosted policy checks passed, including all 26 regression tests. **The [first admitted build](https://github.com/areidyOTH/t3-code-apk-build/actions/runs/38039780208) failed and produced no APK or release assets.** Source preparation and Ghostty native builds completed, but Gradle dependency resolution for `react-native-menu_menu` required Android Build Tools `36.0.0`, which the original image lacked. The SDK is deliberately read-only to the build user, so automatic installation failed. Signing, attestation, publication, and installation remain unverified.
+
+The repair adds independently pinned Build Tools `36.0.0` alongside `37.0.0`. Offline tool checks and a configuration-only check of AGP's default Build Tools 36 selection passed as the non-root build user, with the SDK still read-only. The failed run retains ledger claim `6978601949` and consumes the 10 October Melbourne allowance. No rerun or second APK attempt will be made that day. The run completed at `2026-10-10T09:08:34Z`; the next earliest eligibility is **11 October 2026 at 20:08:34 Australia/Melbourne** (`2026-10-11T09:08:34Z`), subject to the ledger, release policy, and support cutoff. The next scheduled check after that time is 12 October at 01:15 Melbourne. A repaired image does not establish that the full APK build will succeed.
 
 The public repository has immutable releases enabled. Publication uploads and verifies a draft before making it public; once published, the release's assets and tag are protected from replacement.
 
@@ -74,4 +76,4 @@ gh workflow run build-apk.yml --repo areidyOTH/t3-code-apk-build
 gh run list --workflow build-apk.yml --repo areidyOTH/t3-code-apk-build
 ```
 
-This can perform the actual build when all gates pass; it is not a dry run. The workflow publishes a GitHub prerelease with its final attested files. Its initial end-to-end execution remains pending.
+This can perform the actual build when all gates pass; it is not a dry run. A successful workflow publishes a GitHub prerelease with its final attested files. The first attempt failed as documented above; later attempts must respect its consumed allowance and completion-based cooldown.

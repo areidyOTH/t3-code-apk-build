@@ -18,6 +18,13 @@ RUN curl -fL https://dl.google.com/android/repository/build-tools_r37_linux.zip 
     unzip -q /tmp/build-tools.zip -d /tmp/build-tools && mkdir -p /opt/android/build-tools && \
     mv /tmp/build-tools/android-37.0 /opt/android/build-tools/37.0.0 && rm /tmp/build-tools.zip && \
     /opt/android/cmdline-tools/pinned/bin/sdkmanager 'platforms;android-37.0' 'ndk;27.1.12297006' 'cmake;3.22.1'
+# Native libraries using AGP's default need 36 alongside the app's explicit 37.
+# Verified against Google's repository metadata; SDK remains root-owned.
+RUN curl -fL https://dl.google.com/android/repository/build-tools_r36_linux.zip -o /tmp/build-tools36.zip && \
+    echo '5d9ac77fb6ff43d9da518a337b4fcf8f9097113df531d99ccefe80ef7ce8250b  /tmp/build-tools36.zip' | sha256sum -c - && \
+    unzip -q /tmp/build-tools36.zip -d /tmp/build-tools36 && \
+    mv /tmp/build-tools36/android-16 /opt/android/build-tools/36.0.0 && \
+    rm /tmp/build-tools36.zip && rmdir /tmp/build-tools36
 ENV ANDROID_NDK_HOME=/opt/android/ndk/27.1.12297006
 ENV COREPACK_HOME=/opt/corepack
 RUN curl -fL https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz -o /tmp/zig.tar.xz && \

@@ -45,4 +45,4 @@ The generated project selected Gradle `9.4.1`, Android Gradle Plugin `9.2.1`, bu
 
 An accepted release mapping covers only the pinned publicly released beta source and the documented package/name/signing/OTA adaptations. Later upstream source or internal releases need a fresh reviewed Play mapping. Upstream security issues are outside this project's support scope; provenance is not an assurance of malware freedom.
 
-No APK has been built for this project and no remote publishing workflow has been activated.
+The [first admitted hosted build](https://github.com/areidyOTH/t3-code-apk-build/actions/runs/38039780208) failed during Gradle dependency resolution because a native library required Android Build Tools `36.0.0`, which the original image lacked. No APK or release assets were produced; signing, attestation, publication, and installation remain unverified.

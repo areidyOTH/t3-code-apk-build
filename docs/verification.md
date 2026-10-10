@@ -1,6 +1,6 @@
 # Verify a rebuild
 
-No APK or completed hosted CI run exists yet. The instructions here define the required checks; they are not a report of successful end-to-end verification.
+No APK has been produced. Hosted policy checks passed, but the first admitted build failed during Gradle dependency resolution before artifact upload, signing, or publication. The instructions here define the required checks; they are not a report of successful end-to-end verification.
 
 ## Evidence to retain
 
@@ -47,4 +47,4 @@ Successful operation on an actual published release, including authentication of
 
 Checksums detect differing bytes when compared with a trusted value. APK signatures establish the rebuild key's identity. Provenance attestations bind artifact bytes to the stated builder execution; consumers must verify the expected repository/workflow and inspect its behavior.
 
-These checks do not certify upstream security, absence of malware, equivalence to Google's signing key, equality to a Play-generated split APK, or byte-for-byte reproducibility. Independent rebuilding, real hosted CI operation, signing-key continuity, and installation/launch behavior have not yet been tested.
+These checks do not certify upstream security, absence of malware, equivalence to Google's signing key, equality to a Play-generated split APK, or byte-for-byte reproducibility. Independent reproducibility, the completed signed-release pipeline, signing-key continuity, and installation/launch behavior have not yet been tested.
